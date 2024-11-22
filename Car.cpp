@@ -15,7 +15,7 @@ Car::Car(float startX, float startY, float startAngle)
     chassis.setSize(sf::Vector2f(10.f, 20.f));
     chassis.setOrigin(5.f, 10.f);
     chassis.setPosition(posX, posY);
-    
+   
     //Wheel Left
     wheelL.setFillColor(sf::Color(0, 49, 82, 255));
     wheelL.setOutlineColor(sf::Color::White);

@@ -22,7 +22,6 @@ void Trail::addPoint(const sf::Vector2f& position, const sf::Color& color) {
     }
 }
 
-
 void Trail::draw(sf::RenderWindow& window) {
     for (const auto& point : points) {
         sf::CircleShape circle(pointRadius); 

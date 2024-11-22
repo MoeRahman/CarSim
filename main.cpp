@@ -5,6 +5,11 @@
 #include <SFML/Graphics.hpp>
 #include "Trailing.h"
 
+bool toggleSWITCH1{ false };
+bool toggleSWITCH2{ false };
+bool toggleSWITCH3{ false };
+int toggleCOUNT{ 0 };
+
 int main() {
 
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "EKF ROBOTICS SIM");
@@ -13,8 +18,9 @@ int main() {
 
     // Create a car object
     Car car(450.0f, 250.0f, 0.0f);
+
     Trail trail(500, 2); // REAL POSITION Trailing points
-    Trail gpsTrail(1000, 2); // GPS Trailing points
+    Trail gpsTrail(1000, 2);// GPS Trailing points
     // IMU TRAIL
     // EKF FUSED TRAIL
 
@@ -37,6 +43,14 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+            toggleCOUNT = 1;
+            
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
+            toggleCOUNT = 2;
         }
 
         // Time calculation
@@ -63,7 +77,10 @@ int main() {
         //std::cout << gpsData.x << ", " << gpsData.y << std::endl;
 
         trail.addPoint(sf::Vector2f(car.getPosX(), car.getPosY()), sf::Color(255, 187, 0, 255));
-        gpsTrail.addPoint(sf::Vector2f(float(gpsData.x), float(gpsData.y)), sf::Color::Green);
+        if (toggleCOUNT == 1) {
+            gpsTrail.addPoint(sf::Vector2f(float(gpsData.x), float(gpsData.y)), sf::Color::White);
+        }
+
 
         // Update previous state for next frame
         prevPosX = currentPosX;

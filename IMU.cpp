@@ -18,12 +18,12 @@ IMU::Vect2D IMU::getAccelerometerData(double currentPosX, double currentPosY, do
     Vect2D accelData{ 0.0, 0.0 };
 
     // Calculate change in position (velocity)
-    double velX = (currentPosX - lastPosX) / deltaTime;
-    double velY = (currentPosY - lastPosY) / deltaTime;
+    Vect2D velData{ (currentPosX - lastPosX) / deltaTime , 
+                    (currentPosY - lastPosY) / deltaTime };
 
     // Calculate acceleration (change in velocity / time)
-    accelData.x = velX / deltaTime;
-    accelData.y = velY / deltaTime;
+    accelData.x = velData.x / deltaTime;
+    accelData.y = velData.y / deltaTime;
 
     // Add Gaussian noise
     accelData.x += accel_noise_dist(rng);
