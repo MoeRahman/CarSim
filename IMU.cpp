@@ -3,8 +3,7 @@
 #include "IMU.h"
 #include <iostream>
 
-
-IMU::IMU(double accel_noise_stddev, double gyro_noise_stddev)
+IMU::IMU(float accel_noise_stddev, float gyro_noise_stddev)
     : accel_noise_stddev(accel_noise_stddev), gyro_noise_stddev(gyro_noise_stddev),
     accel_noise_dist(0.0, accel_noise_stddev), gyro_noise_dist(0.0, gyro_noise_stddev) {
 
@@ -14,16 +13,20 @@ IMU::IMU(double accel_noise_stddev, double gyro_noise_stddev)
 }
 
 // Function to simulate reading accelerometer data
-IMU::Vect2D IMU::getAccelerometerData(double currentPosX, double currentPosY, double lastPosX, double lastPosY, double deltaTime) {
-    Vect2D accelData{ 0.0, 0.0 };
+Vector2f IMU::getAccelerometerData(Vector2f currentPos, Vector2f lastPos, float deltaTime) {
 
+    // Handle zero division 
+    if (deltaTime == 0.0f) {
+        throw std::invalid_argument("Zero Division");
+    }
+    
     // Calculate change in position (velocity)
-    Vect2D velData{ (currentPosX - lastPosX) / deltaTime , 
-                    (currentPosY - lastPosY) / deltaTime };
+    Vector2f velData{ static_cast<float>((currentPos.x - lastPos.x) / deltaTime) , 
+                      static_cast<float>((currentPos.x - lastPos.y) / deltaTime) };
 
     // Calculate acceleration (change in velocity / time)
-    accelData.x = velData.x / deltaTime;
-    accelData.y = velData.y / deltaTime;
+    Vector2f accelData { velData.x / deltaTime,
+                         velData.y / deltaTime };
 
     // Add Gaussian noise
     accelData.x += accel_noise_dist(rng);
@@ -33,20 +36,31 @@ IMU::Vect2D IMU::getAccelerometerData(double currentPosX, double currentPosY, do
 }
 
 // Function to simulate reading gyroscope data
-double IMU::getGyroscopeData(double currentAngle, double lastAngle, double deltaTime) {
+float IMU::getGyroscopeData(float currentAngle, float lastAngle, float deltaTime) {
+
     // Calculate change in angle
-    double deltaAngle = currentAngle - lastAngle;
+    float deltaAngle = currentAngle - lastAngle;
 
     // Normalize angle difference to handle wrap-around at 360 degrees
     if (deltaAngle > 180.0) deltaAngle -= 360.0;
     else if (deltaAngle < -180.0) deltaAngle += 360.0;
 
     // Calculate angular velocity (change in angle / time)
-    double gyroData = deltaAngle / deltaTime; // Angular velocity in degrees per second
+    float gyroData = deltaAngle / deltaTime; // Angular velocity in degrees per second
 
     // Add Gaussian noise
     gyroData += gyro_noise_dist(rng);
 
     return gyroData;
+}
+
+// Compute position using noisy acceleration data
+Vector2f IMU::imuIntegration(Vector2f noisyAccelData, float deltaTime) {
+
+    // Calculate Velocity
+    Vector2f velocity{ noisyAccelData.x * deltaTime,
+                       noisyAccelData.y * deltaTime};
+
+    return velocity;
 }
 

@@ -4,25 +4,23 @@
 #define GPS_H
 
 #include <random>
-
+#include "IMU.h"
+#include <SFML/System/Vector2.hpp>
 
 class GPS{
 public:
-	struct GPS2D {
-		double x, y;
-	};
 
-	GPS(double gps_noise_stddev);
+	GPS(float gps_noise_stddev);
 
-	GPS2D getGPSData(double currentPosX, double currentPosY);
+	Vector2f getGPSData(Vector2f currentPos);
 
 private:
 	// Noise standard deviation for GPS position
-	double gps_noise_stddev;
+	float gps_noise_stddev;
 
 	// Random number generator
 	std::default_random_engine rng;
-	std::normal_distribution<double> gps_noise_dist;
+	std::normal_distribution<float> gps_noise_dist;
 	
 };
 

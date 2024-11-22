@@ -6,7 +6,7 @@
 #endif
 
 Car::Car(float startX, float startY, float startAngle)
-    : posX(startX), posY(startY), angle(startAngle),wheelAngle(0.0), speed(0.0), maxSpeed(6.0), acc(0.2), turnFactor(0.8) {
+    : posX(startX), posY(startY), angle(startAngle),wheelAngle(0.0), speed(0.0), maxSpeed(25.0f), acc(2.5f), turnFactor(15.f) {
 
     //Chassis
     chassis.setFillColor(sf::Color(0, 49, 82, 255));
@@ -47,23 +47,23 @@ Car::Car(float startX, float startY, float startAngle)
     backWheelL.setPosition(posX, posY);
 }
 
-void Car::handleInput() {
+void Car::handleInput(float deltaTime) {
     
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-        speed < maxSpeed ? speed += acc : speed = maxSpeed;
+        speed < maxSpeed ? speed += acc*deltaTime : speed = maxSpeed;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-        speed > -maxSpeed ? speed -= acc*0.5 : speed = -maxSpeed;
+        speed > -maxSpeed ? speed -= 0.5*acc*deltaTime : speed = -0.5*maxSpeed;
     }
     if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-        speed - acc > 0 ? speed -= acc*0.1 : (speed + acc < 0 ? speed += acc : speed = 0);
+        speed - acc > 0 ? speed -= 2*acc*deltaTime : (speed + acc < 0 ? speed += acc*deltaTime : speed = 0);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-        angle -= turnFactor * speed;
+        angle -= turnFactor * speed*deltaTime;
         wheelAngle -= 2;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-        angle += turnFactor * speed;
+        angle += turnFactor * speed*deltaTime;
         wheelAngle += 2;
     }
     if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
@@ -71,7 +71,7 @@ void Car::handleInput() {
     }
 }
 
-void Car::update() {
+void Car::update(float deltaTime) {
     posX += speed * sin(angle * M_PI / 180);
     posY -= speed * cos(angle * M_PI / 180);
     chassis.setPosition(posX, posY);

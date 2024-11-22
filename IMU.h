@@ -4,31 +4,33 @@
 #define IMU_H
 
 #include <random>
+#include <SFML/System/Vector2.hpp>
+
+using namespace sf;
 
 class IMU {
 public:
 
-    struct Vect2D {
-        double x, y;
-    };
-
-    IMU(double accel_noise_stddev, double gyro_noise_stddev);
+    IMU(float accel_noise_stddev, float gyro_noise_stddev);
 
     // Simulates reading accelerometer data based on car's velocity and time step
-    Vect2D getAccelerometerData(double currentPosX, double currentPosY, double lastPosX, double lastPosY, double deltaTime);
+    Vector2f getAccelerometerData(Vector2f currentPos, Vector2f lastPos, float deltaTime);
 
     // Simulates reading gyroscope data based on car's angle and time step
-    double getGyroscopeData(double currentAngle, double lastAngle, double deltaTime);
+    float getGyroscopeData(float currentAngle, float lastAngle, float deltaTime);
+
+    //IMU Fusion (integrate accelData -> position)
+    Vector2f imuIntegration(Vector2f noisyAccelData, float deltaTime);
 
 private:
     // Noise standard deviations for accelerometer and gyroscope
-    double accel_noise_stddev;
-    double gyro_noise_stddev;
+    float accel_noise_stddev;
+    float gyro_noise_stddev;
 
     // Random number generators for Gaussian noise
     std::default_random_engine rng;
-    std::normal_distribution<double> accel_noise_dist;
-    std::normal_distribution<double> gyro_noise_dist;
+    std::normal_distribution<float> accel_noise_dist;
+    std::normal_distribution<float> gyro_noise_dist;
 };
 
 #endif

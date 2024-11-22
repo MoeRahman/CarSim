@@ -25,14 +25,15 @@ int main() {
     // EKF FUSED TRAIL
 
     // IMU object (with noise standard deviations)
-    IMU imu(0.1, 0.05);
+    IMU imu(0.1f, 0.05f);
 
     // GPS object (with noise standandard deviation)
     GPS gps(10);
 
     // Variables to store previous state
-    float prevPosX = car.getPosX();
-    float prevPosY = car.getPosY();
+    Vector2f prevPos{ car.getPosX(),
+                      car.getPosY() };
+
     float prevAngle = car.getAngle();
 
     // Time management
@@ -57,37 +58,40 @@ int main() {
         float deltaTime = clock.restart().asSeconds();
 
         // Handle input and update the car's position and angle
-        car.handleInput();
-        car.update();
+        car.handleInput(deltaTime);
+        car.update(deltaTime);
 
         // Get current state for IMU measurements
-        float currentPosX = car.getPosX();
-        float currentPosY = car.getPosY();
+        Vector2f currentPos{ car.getPosX(),
+                             car.getPosY() };
+
         float currentAngle = car.getAngle();
 
         // Get simulated IMU data
-        IMU::Vect2D accelData = imu.getAccelerometerData(currentPosX, currentPosY, prevPosX, prevPosY, deltaTime);
+        Vector2f accelData = imu.getAccelerometerData(currentPos, prevPos, deltaTime);
+
         double gyroData = imu.getGyroscopeData(currentAngle, prevAngle, deltaTime);
 
         // Get simulated GPS data
-        GPS::GPS2D gpsData = gps.getGPSData(currentPosX, currentPosY);
+        Vector2f gpsData = gps.getGPSData(currentPos);
 
         // Print Sensor data for debugging
         //std::cout << accelData.x << ", " << accelData.y << ", " << gyroData << std::endl;
         //std::cout << gpsData.x << ", " << gpsData.y << std::endl;
 
         trail.addPoint(sf::Vector2f(car.getPosX(), car.getPosY()), sf::Color(255, 187, 0, 255));
+        
         if (toggleCOUNT == 1) {
-            gpsTrail.addPoint(sf::Vector2f(float(gpsData.x), float(gpsData.y)), sf::Color::White);
+            gpsTrail.addPoint(gpsData, sf::Color::White);
         }
 
 
         // Update previous state for next frame
-        prevPosX = currentPosX;
-        prevPosY = currentPosY;
+        prevPos.x = currentPos.x;
+        prevPos.y = currentPos.y;
         prevAngle = currentAngle;
         
-        view1.setCenter(sf::Vector2f(currentPosX, currentPosY));
+        view1.setCenter(currentPos);
 
         window.clear(sf::Color(0,49,82,255));
         window.setView(view1);

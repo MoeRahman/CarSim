@@ -23,8 +23,8 @@ private:
 public:
     Car(float startX, float startY, float startAngle);
 
-    void handleInput();
-    void update();
+    void handleInput(float deltaTime);
+    void update(float deltaTime);
     void draw(sf::RenderWindow& window);
 
     float getPosX() const;
